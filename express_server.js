@@ -5,7 +5,7 @@ const PORT = 8080; // default port 8080
 app.set("view engine", "ejs");
 
 function generateRandomString() {
-  Math.random().toString(36).substring(2,8);
+  return Math.random().toString(36).substring(2,8);
 }
 
 //a database to keep track of all the URLs and their shortened forms
@@ -53,9 +53,18 @@ app.get("/urls/:shortURL", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
+app.get("/u/:shortURL", (req, res) => {
+  const longURL = urlDatabase[req.params.shortURL];
+  res.redirect(longURL);
+});
+
 app.post("/urls", (req, res) => {
   console.log(req.body);  // Log the POST request body to the console
-  res.send("Ok");         // Respond with 'Ok' (we will replace this)
+  const shorty = generateRandomString();
+  urlDatabase[shorty] = req.body.longURL;
+  console.log(urlDatabase);
+  res.redirect(`/urls/${shorty}`);
+  
 });
 
 app.listen(PORT, () => {
