@@ -4,6 +4,10 @@ const PORT = 8080; // default port 8080
 
 app.set("view engine", "ejs");
 
+function generateRandomString() {
+  Math.random().toString(36).substring(2,8);
+}
+
 //a database to keep track of all the URLs and their shortened forms
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
