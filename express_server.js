@@ -78,6 +78,12 @@ app.post("/login", (req, res) => {
   res.redirect('/urls');
 });
 
+app.post("/logout", (req, res) => {
+  console.log('logging out');
+  res.clearCookie('username');
+  res.redirect('/urls');
+});
+
 app.post("/urls/:id", (req, res) => {
   console.log('updating URL', req.body);
   urlDatabase[req.params.id] = req.body.longURL;
