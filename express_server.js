@@ -6,15 +6,39 @@ const PORT = 8080; // default port 8080
 app.use(cookieParser());
 app.set("view engine", "ejs");
 
+// email lookup helper
+let emailLookup = function(email) {
+  for (let user in users) {
+    if (users[user].email === email) {
+      return true;
+    } 
+  }
+  return false;
+};
 
+// 6 alphanumeric random string generator
 function generateRandomString() {
   return Math.random().toString(36).substring(2,8);
-}
+};
 
 //a database to keep track of all the URLs and their shortened forms
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
+};
+
+//a global object for users.  Maybe an array of objects??
+const users = { 
+  "userRandomID": {
+    id: "userRandomID", 
+    email: "user@example.com", 
+    password: "purple-monkey-dinosaur"
+  },
+ "user2RandomID": {
+    id: "user2RandomID", 
+    email: "user2@example.com", 
+    password: "dishwasher-funk"
+  }
 };
 
 const bodyParser = require("body-parser");
@@ -71,6 +95,34 @@ app.get("/u/:shortURL", (req, res) => {
   res.redirect(longURL);
 });
 
+app.get("/register", (req, res) => {
+  let templateVars = {
+    username: req.cookies["username"]
+  };
+  res.render("register", templateVars);
+});
+
+// ********************* POSTS *************************
+
+app.post("/register", (req, res) => {
+  //console.log(emailLookup("user2@example.com"));
+  console.log(req.body.email);
+  if (!req.body.email || !req.body.password) {
+    res.status(400).send('Please add email and password');
+  } 
+  else if (emailLookup(req.body.email)) {
+    res.status(400).send('Your email already exists. Please login.');
+  } else {
+    console.log('register post');
+    console.log(req.body);
+    const userId = generateRandomString();
+    const user = {id: userId, email: req.body.email, password: req.body.password};
+    users[userId] = user;
+    console.log(users);
+    res.cookie('userId', userId);
+    res.redirect('/urls');
+  }});
+
 app.post("/login", (req, res) => {
   console.log('cookie login');
   console.log(req.body);
@@ -106,7 +158,6 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${shorty}`);
   
 });
-
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
