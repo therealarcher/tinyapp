@@ -49,8 +49,8 @@ const users = {
     email: "user@example.com", 
     password: "123"
   },
- "user2RandomID": {
-    id: "user2RandomID", 
+  "aJ48lW": {
+    id: "aJ48lW", 
     email: "user2@example.com", 
     password: "123"
   }
@@ -125,8 +125,12 @@ app.get("/urls/:shortURL", (req, res) => {
 });
 
 app.get("/u/:shortURL", (req, res) => {
-  console.log(`APP.GET("/u/:shortURL")`)
-  const longURL = urlDatabase[req.params.shortURL];
+  console.log(`APP.GET("/u/:shortURL")`);
+  console.log(urlDatabase);
+  console.log(req.params);
+  console.log(urlDatabase[req.params.shortURL])
+  const longURL = urlDatabase[req.params.shortURL].longURL;
+  //res.status(200);
   res.redirect(longURL);
   console.log('*********************');
 });
