@@ -109,7 +109,7 @@ app.get("/urls/new", (req, res) => {
   } else {
     res.render("urls_new",templateVars);
   }
-  console.log('*********************')
+  console.log('*********************');
 });
 
 app.get("/urls/:shortURL", (req, res) => {
@@ -121,14 +121,14 @@ app.get("/urls/:shortURL", (req, res) => {
   };
   console.log('test', templateVars);
   res.render("urls_show", templateVars);
-  console.log('*********************')
+  console.log('*********************');
 });
 
 app.get("/u/:shortURL", (req, res) => {
   console.log(`APP.GET("/u/:shortURL")`)
   const longURL = urlDatabase[req.params.shortURL];
   res.redirect(longURL);
-  console.log('*********************')
+  console.log('*********************');
 });
 
 app.get("/register", (req, res) => {
@@ -137,7 +137,7 @@ app.get("/register", (req, res) => {
     user: null
   };
   res.render("register", templateVars);
-  console.log('*********************')
+  console.log('*********************');
 });
 
 app.get("/login", (req, res) => {
@@ -147,7 +147,7 @@ app.get("/login", (req, res) => {
     user: users[req.cookies.user_id]
   };
   res.render("login", templateVars);
-  console.log('*********************')
+  console.log('*********************');
 });
 
 // ********************* POSTS *************************
@@ -170,7 +170,7 @@ app.post("/register", (req, res) => {
     console.log(users);
     res.cookie('user_id', userId);
     res.redirect('/urls');
-    console.log('*********************')
+    console.log('*********************');
   }});
 
 app.post("/login", (req, res) => {
@@ -188,7 +188,7 @@ app.post("/login", (req, res) => {
     res.cookie('user_id', userInfo.id);
     res.redirect('/urls');
   }
-  console.log('*********************')
+  console.log('*********************');
 });
 
 app.post("/logout", (req, res) => {
@@ -196,7 +196,7 @@ app.post("/logout", (req, res) => {
   console.log('logging out');
   res.clearCookie('user_id');
   res.redirect('/urls');
-  console.log('*********************')
+  console.log('*********************');
 });
 
 app.post("/urls/:id", (req, res) => {
@@ -205,7 +205,7 @@ app.post("/urls/:id", (req, res) => {
   console.log(req.params.id);
   urlDatabase[req.params.id].longURL = req.body.longURL;
   res.redirect('/urls'); //was '/urls'
-  console.log('*********************')
+  console.log('*********************');
 });
 
 app.post("/urls/:shortURL/delete", (req, res) => {
@@ -215,7 +215,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   delete urlDatabase[req.params.shortURL];
   console.log('urlDatabase: ', urlDatabase);
   res.redirect("/urls");
-  console.log('*********************')
+  console.log('*********************');
 });
 
 app.post("/urls", (req, res) => {
