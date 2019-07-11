@@ -16,6 +16,21 @@ const emailLookup = function(email) {
   return false;
 };
 
+// urls helper function which returns the URLs where the userID is equal
+// to the id of the currently loggin in user.
+// if userID === cookie for user, return URLS (object? array?)
+// 2 arrays, filter one on the other?
+// /urls - send the return of helper function to render page
+const urlsForUser = function(id) {
+  let urls = {}
+  for (let shorty in urlDatabase) {
+    if (id === urlDatabase[shorty].userID) {
+      urls[shorty] = urlDatabase[shorty];
+    } 
+  }
+  return urls;
+}
+
 // 6 alphanumeric random string generator
 function generateRandomString() {
   return Math.random().toString(36).substring(2,8);
@@ -67,12 +82,19 @@ app.get("/fetch", (req, res) => {
 
 app.get("/urls", (req, res) => {
   console.log(`APP.GET("/urls")`)
-  let templateVars = {
-    urls: urlDatabase, 
-    user: users[req.cookies.user_id]
+  if (!users[req.cookies.user_id]) {
+    return res.redirect('/login');
   };
-  res.render("urls_index", templateVars);
-  console.log('*********************')
+  //console.log(users[req.cookies.user_id].id)
+  let signedInUser = users[req.cookies.user_id].id
+  let templateVars = {
+    urls: urlsForUser(signedInUser), //helper function
+    user: users[req.cookies.user_id]
+  } 
+ 
+  res.render("urls_index",templateVars);
+
+  console.log('*********************');
 });
 
 app.get("/urls/new", (req, res) => {
@@ -180,7 +202,8 @@ app.post("/logout", (req, res) => {
 app.post("/urls/:id", (req, res) => {
   console.log(`APP.POST("/urls/:id)`)
   console.log('updating URL', req.body);
-  urlDatabase[req.params.id] = req.body.longURL;
+  console.log(req.params.id);
+  urlDatabase[req.params.id].longURL = req.body.longURL;
   res.redirect('/urls'); //was '/urls'
   console.log('*********************')
 });
