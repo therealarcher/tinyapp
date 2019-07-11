@@ -8,7 +8,7 @@
       <div class="navbar-nav">
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
-        <a class="nav-item nav-link" href="/register">Create a New Account</a>
+        
       </div>
     </div>
     <%if (user) {%>
@@ -17,11 +17,8 @@
         <button type="submit" class="btn btn-outline-dark">LOGOUT</button>
       </form>
       <%} else {%>
-    <form method="POST" action="/login">
-      <span> username: </span><input type="text" name="username"/>
-
-      <button type="submit" class="btn btn-outline-dark">SUBMIT</button>
-    </form>
+        <a class="nav-item nav-link" href="/login">Login</a>
+        <a class="nav-item nav-link" href="/register">Create a New Account</a>
   <%}%>
   </nav>
 </header>
