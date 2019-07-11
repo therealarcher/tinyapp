@@ -7,14 +7,23 @@ app.use(cookieParser());
 app.set("view engine", "ejs");
 
 // email lookup helper
-let emailLookup = function(email) {
+const emailLookup = function(email) {
   for (let user in users) {
     if (users[user].email === email) {
-      return true;
-    } 
+      return users[user];
+    }
   }
   return false;
 };
+
+// const emailLookup = function(email) {
+//   for (let user in users) {
+//     if (users[user].email === email) {
+//       return true;
+//     } 
+//   }
+//   return false;
+// };
 
 // 6 alphanumeric random string generator
 function generateRandomString() {
@@ -68,14 +77,14 @@ app.get("/fetch", (req, res) => {
 app.get("/urls", (req, res) => {
   let templateVars = {
     urls: urlDatabase, 
-    username: req.cookies["username"]
+    user: users[req.cookies.user_id]
   };
   res.render("urls_index", templateVars);
 });
 
 app.get("/urls/new", (req, res) => {
   let templateVars = {
-    username: req.cookies["username"]
+    user: users[req.cookies.user_id]
   };
   res.render("urls_new", templateVars);
 });
@@ -84,7 +93,7 @@ app.get("/urls/:shortURL", (req, res) => {
   let templateVars = {
     shortURL: req.params.shortURL, 
     longURL: urlDatabase[req.params.shortURL],
-    username: req.cookies["username"]
+    user: users[req.cookies.user_id]
   }; // longURL same as short?
   console.log('test', templateVars);
   res.render("urls_show", templateVars);
@@ -97,9 +106,17 @@ app.get("/u/:shortURL", (req, res) => {
 
 app.get("/register", (req, res) => {
   let templateVars = {
-    username: req.cookies["username"]
+    user: null
   };
   res.render("register", templateVars);
+});
+
+app.get("/login", (req, res) => {
+  let templateVars = {
+    //user: null
+    user: users[req.cookies.user_id]
+  };
+  res.render("login", templateVars);
 });
 
 // ********************* POSTS *************************
@@ -119,20 +136,29 @@ app.post("/register", (req, res) => {
     const user = {id: userId, email: req.body.email, password: req.body.password};
     users[userId] = user;
     console.log(users);
-    res.cookie('userId', userId);
+    res.cookie('user_id', userId);
     res.redirect('/urls');
   }});
 
 app.post("/login", (req, res) => {
-  console.log('cookie login');
   console.log(req.body);
-  res.cookie('username', req.body.username);
-  res.redirect('/urls');
+  console.log(emailLookup(req.body.email))
+  let userInfo = emailLookup(req.body.email)
+  console.log('user info: ', userInfo);
+  if (!emailLookup(req.body.email)) {
+    res.status(400).send('email not found.  Please try again or create an account.')
+  } else if 
+    (userInfo.password !== req.body.password) {
+    res.status(400).send('wrong password! Please try again.')
+  } else {
+    res.cookie('user_id', userInfo.id);
+    res.redirect('/urls');
+  }
 });
 
 app.post("/logout", (req, res) => {
   console.log('logging out');
-  res.clearCookie('username');
+  res.clearCookie('user_id');
   res.redirect('/urls');
 });
 
