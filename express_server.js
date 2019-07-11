@@ -214,11 +214,29 @@ app.post("/urls/:id", (req, res) => {
 
 app.post("/urls/:shortURL/delete", (req, res) => {
   console.log(`APP.POST("/urls/:shortURL/delete")`)
-  console.log('deleting post');
   //console.log('req.params: ', req.params);
-  delete urlDatabase[req.params.shortURL];
-  console.log('urlDatabase: ', urlDatabase);
-  res.redirect("/urls");
+  //if username of user matches that of the URL, follow through with delete funciton
+  //console.log('userId', urlDatabase[req.params.shortURL].userID);
+  //console.log(req.params);
+  //console.log(users[req.cookies.user_id].id)
+  //console.log('cookie', users[req.cookies.user_id].id);
+  //delete urlDatabase[req.params.shortURL];
+  //  res.redirect("/urls");
+  // console.log('225', users[req.cookies.user_id].id)
+  const user = users[req.cookies.user_id];
+  if (user) {
+    if (urlDatabase[req.params.shortURL].userID === users[req.cookies.user_id].id) {
+      delete urlDatabase[req.params.shortURL];
+      res.redirect("/urls");
+    }
+    else {
+      console.log('230')
+      res.status(400).send("You are not authorized to delete!")
+    }
+  } else {
+    res.status(400).send('User not found');
+  }
+  //console.log('urlDatabase: ', urlDatabase);
   console.log('*********************');
 });
 
