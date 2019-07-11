@@ -146,10 +146,10 @@ app.post("/login", (req, res) => {
   let userInfo = emailLookup(req.body.email)
   console.log('user info: ', userInfo);
   if (!emailLookup(req.body.email)) {
-    res.status(400).send('email not found.  Please try again or create an account.')
+    res.status(403).send('email not found.  Please try again or create an account.')
   } else if 
     (userInfo.password !== req.body.password) {
-    res.status(400).send('wrong password! Please try again.')
+    res.status(403).send('wrong password! Please try again.')
   } else {
     res.cookie('user_id', userInfo.id);
     res.redirect('/urls');
