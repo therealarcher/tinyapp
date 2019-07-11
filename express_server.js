@@ -16,15 +16,6 @@ const emailLookup = function(email) {
   return false;
 };
 
-// const emailLookup = function(email) {
-//   for (let user in users) {
-//     if (users[user].email === email) {
-//       return true;
-//     } 
-//   }
-//   return false;
-// };
-
 // 6 alphanumeric random string generator
 function generateRandomString() {
   return Math.random().toString(36).substring(2,8);
@@ -83,10 +74,15 @@ app.get("/urls", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
+  console.log(`value of users[req.cookies.user_id]`, users[req.cookies.user_id])
   let templateVars = {
     user: users[req.cookies.user_id]
   };
-  res.render("urls_new", templateVars);
+  if (!users[req.cookies.user_id]) {
+    res.render("login", templateVars);
+  } else {
+    res.render("urls_new",templateVars);
+  }
 });
 
 app.get("/urls/:shortURL", (req, res) => {
@@ -94,7 +90,7 @@ app.get("/urls/:shortURL", (req, res) => {
     shortURL: req.params.shortURL, 
     longURL: urlDatabase[req.params.shortURL],
     user: users[req.cookies.user_id]
-  }; // longURL same as short?
+  };
   console.log('test', templateVars);
   res.render("urls_show", templateVars);
 });
