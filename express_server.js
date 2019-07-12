@@ -2,6 +2,7 @@ const express = require("express");
 var cookieParser = require('cookie-parser');
 const app = express();
 const PORT = 8080; // default port 8080
+const bcrypt = require('bcrypt');
 
 app.use(cookieParser());
 app.set("view engine", "ejs");
@@ -29,7 +30,7 @@ const urlsForUser = function(id) {
     } 
   }
   return urls;
-}
+};
 
 // 6 alphanumeric random string generator
 function generateRandomString() {
@@ -90,7 +91,7 @@ app.get("/urls", (req, res) => {
   let templateVars = {
     urls: urlsForUser(signedInUser), //helper function
     user: users[req.cookies.user_id]
-  } 
+  };
  
   res.render("urls_index",templateVars);
 
@@ -158,7 +159,6 @@ app.get("/login", (req, res) => {
 
 app.post("/register", (req, res) => {
   console.log(`APP.POST("/register")`)
-  //console.log(emailLookup("user2@example.com"));
   console.log(req.body.email);
   if (!req.body.email || !req.body.password) {
     res.status(400).send('Please add email and password');
@@ -166,28 +166,36 @@ app.post("/register", (req, res) => {
   else if (emailLookup(req.body.email)) {
     res.status(400).send('Your email already exists. Please login.');
   } else {
-    console.log('register post');
-    console.log(req.body);
+    console.log('req.body', req.body);
+    let password = req.body.password;
+    const hashedPassword = bcrypt.hashSync(password, 10);
+    console.log(hashedPassword);
+    console.log(bcrypt.compareSync(password, hashedPassword));
     const userId = generateRandomString();
-    const user = {id: userId, email: req.body.email, password: req.body.password};
+    const user = {id: userId, email: req.body.email, password: hashedPassword};
     users[userId] = user;
-    console.log(users);
     res.cookie('user_id', userId);
     res.redirect('/urls');
+    console.log(user);
     console.log('*********************');
   }});
 
 app.post("/login", (req, res) => {
-  console.log(`APP.POST("/login")`)
+  console.log(`APP.POST("/login")`);
+  console.log('req.body', req.body);
+  let password = req.body.password;
+  const hashedPassword = bcrypt.hashSync(password, 10);
+  console.log(hashedPassword);
+  console.log(bcrypt.compareSync(password, hashedPassword));
   console.log(req.body);
-  console.log(emailLookup(req.body.email))
-  let userInfo = emailLookup(req.body.email)
+  console.log(emailLookup(req.body.email));
+  let userInfo = emailLookup(req.body.email);
   console.log('user info: ', userInfo);
+  //res.status(200).send('line 193')
   if (!emailLookup(req.body.email)) {
-    res.status(403).send('email not found.  Please try again or create an account.')
-  } else if 
-    (userInfo.password !== req.body.password) {
-    res.status(403).send('wrong password! Please try again.')
+    res.status(403).send('email not found.  Please try again or create an account.');
+  } else if (!bcrypt.compareSync(password, userInfo.password)) {
+    res.status(403).send('wrong password! Please try again.');
   } else {
     res.cookie('user_id', userInfo.id);
     res.redirect('/urls');
